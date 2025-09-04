@@ -1,7 +1,11 @@
 #include <iostream>
 
 int main() {
-    std::cout<<"Hello!"<<std::endl;
+    int a = 5;
+    if(a>6) {
+        std::cout<<"True"<<std::endl;
+    } else {
+        std::cout<<"False"<<std::endl;
+    }
     return 0;
-    
 }
