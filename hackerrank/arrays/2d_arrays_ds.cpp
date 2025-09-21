@@ -1,5 +1,4 @@
 #include <iostream>
-using namespace std;
 
 int* hourglass_sum(int arr[][6], int n, int &size) {
     size = (n-2) * (n-2);
@@ -29,7 +28,7 @@ int main() {
     int arr[n][n];
     for(int i=0;i<n;i++) {
         for(int j=0;j<n;j++) {
-            cin>>arr[i][j];
+            std::cin>>arr[i][j];
         }
     }
     int s;
