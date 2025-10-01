@@ -1,45 +1,43 @@
 #include <iostream>
 #include "../../node_list.cpp"
 
-DoublyLinkedList* sortedInsert(DoublyLinkedList* list, int data) {
+Node* sortedInsert(Node* head, int data) {
     Node* new_node = new Node(data);
-    if(!list -> head) {
-        list -> head = new_node;
-        list -> tail = new_node;
-        return list;
+    if(!head) {
+        return new_node;
     }
-    
-    if(data <= list->head->value) {
-        new_node -> next = list -> head;
-        list -> head -> prev = new_node;
-        list -> head = new_node;
-        return list;
+    if(data <= head->value) {
+        new_node -> next = head;
+        head -> prev = new_node;
+        return new_node;
     }
-
-    if(data >= list->tail->value) {
-        list->tail->next = new_node;
-        new_node->prev = list->tail;
-        list->tail = new_node;
-        return list;
+    Node* current = head;
+    while(current -> next && current -> next -> value < data) {
+        current = current -> next;
     }
-    Node* current = list->head;
-    while(current && current->value < data) {
-        current = current->next;
+    new_node -> next = current -> next;
+    new_node -> prev = current;
+    if(current -> next) {
+        current -> next -> prev = new_node;
     }
-    new_node->next = current;
-    new_node->prev = current->prev;
-    current->prev->next = new_node;
-    current->prev = new_node;
-    return list;
+    current -> next = new_node;
+    return head;
 }
 
 int main() {
-    DoublyLinkedList *list = new DoublyLinkedList();
-    sortedInsert(list, 10);
-    sortedInsert(list, 3);
-    sortedInsert(list, 1);
-    sortedInsert(list, -2);
-    sortedInsert(list, 0);
-    list->print_forward(); // -2 0 1 3 10
+    Node *head = nullptr;
+    head = sortedInsert(head, 10);
+    head = sortedInsert(head, 3);
+    head = sortedInsert(head, 9999);
+    head = sortedInsert(head, 1);
+    head = sortedInsert(head, -2);
+    head = sortedInsert(head, 0);
+    
+    Node* current = head;
+    while(current) {
+        std::cout<<current->value<<" ";
+        current = current->next;
+    }
+    std::cout<<"\n";
     return 0;
 }
