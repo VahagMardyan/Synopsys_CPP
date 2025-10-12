@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../node_list.cpp"
+#include "../../DoublyLinkedList.cpp"
 
 Node* reverse(Node* head) {
     if(!head) {

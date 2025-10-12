@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../node_list.cpp"
+#include "../../DoublyLinkedList.cpp"
 
 Node* sortedInsert(Node* head, int data) {
     Node* new_node = new Node(data);

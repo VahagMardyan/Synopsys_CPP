@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../node_list.cpp"
+#include "../../DoublyLinkedList.cpp"
 
 bool has_cycle(Node *head) {
     if(!head) return false;

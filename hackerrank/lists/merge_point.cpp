@@ -1,5 +1,6 @@
 #include <iostream>
-#include "../../node_list.cpp"
+#include "../../DoublyLinkedList.cpp"
+
 
 int findMergedNode(Node* head1, Node* head2) {
     Node* p1 = head1;

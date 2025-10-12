@@ -1,5 +1,6 @@
 #include <iostream>
-#include "../../node_list.cpp"
+#include "../../DoublyLinkedList.cpp"
+
 
 Node* insertAt(Node* head, int data, int pos) {
     Node* new_node = new Node(data);
