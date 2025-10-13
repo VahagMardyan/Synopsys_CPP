@@ -39,18 +39,18 @@ class DoublyLinkedList {
             return tail;
         }
 
-        void insert(Node* list, int data) {
-            if(!list) return;
+        void insert(Node* node, int data) {
+            if(!node) return;
             Node* new_node = new Node(data);
-            new_node->next = list->next;
-            new_node->prev = list;
+            new_node->next = node->next;
+            new_node->prev = node;
 
-            if(list->next) {
-                list->next->prev = new_node;
+            if(node->next) {
+                node->next->prev = new_node;
             } else {
                 tail = new_node;
             }
-            list->next = new_node;
+            node->next = new_node;
         }
 
         void push_back(int data) {
@@ -65,19 +65,19 @@ class DoublyLinkedList {
             }
         }
 
-        void erase(Node* list) {
-            if(!list) return;
-            if(list == head) {
+        void erase(Node* node) {
+            if(!node) return;
+            if(node == head) {
                 pop_front();
                 return;
             }
-            if(list == tail) {
+            if(node == tail) {
                 pop_back();
                 return;
             }
-            list->prev->next = list->next;
-            list->next->prev = list->prev;
-            delete list;
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+            delete node;
         }
 
         void push_front(int data) {
