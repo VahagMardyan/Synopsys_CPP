@@ -7,6 +7,13 @@ class Node {
         Node* prev;
         Node(int val) : value(val), next(nullptr), prev(nullptr) {};
         Node() {}
+        Node* get_next() {
+            return next;
+        }
+
+        Node* get_prev() {
+            return prev;
+        }
 };
 
 class DoublyLinkedList {
@@ -15,6 +22,36 @@ class DoublyLinkedList {
         Node* tail;
     public:
         DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+        ~DoublyLinkedList() {
+            Node* current = head;
+            while(current) {
+                Node* next = current->next;
+                delete current;
+                current = next;
+            }
+        }
+
+        Node* begin() {
+            return head;
+        }
+        Node* end() {
+            return tail;
+        }
+
+        void insert(Node* list, int data) {
+            if(!list) return;
+            Node* new_node = new Node(data);
+            new_node->next = list->next;
+            new_node->prev = list;
+
+            if(list->next) {
+                list->next->prev = new_node;
+            } else {
+                tail = new_node;
+            }
+            list->next = new_node;
+        }
 
         void push_back(int data) {
             Node* new_node = new Node(data);
@@ -28,6 +65,21 @@ class DoublyLinkedList {
             }
         }
 
+        void erase(Node* list) {
+            if(!list) return;
+            if(list == head) {
+                pop_front();
+                return;
+            }
+            if(list == tail) {
+                pop_back();
+                return;
+            }
+            list->prev->next = list->next;
+            list->next->prev = list->prev;
+            delete list;
+        }
+
         void push_front(int data) {
             Node* new_node = new Node(data);
             if(!head) {
@@ -38,26 +90,6 @@ class DoublyLinkedList {
                 head -> prev = new_node;
                 head = new_node;
             }
-        }
-
-        void push_at(int pos, int data) {
-            if(pos <= 0) {
-                push_front(data);
-                return;
-            }
-            Node *current = head;
-            for(size_t i=0; current && i < pos - 1; i++) {
-                current = current->next;
-            }
-            if(!current || !current->next) {
-                push_back(data);
-                return;
-            }
-            Node* new_node = new Node(data);
-            new_node->next = current -> next;
-            new_node -> prev = current;
-            current->next->prev = new_node;
-            current -> next = new_node;
         }
 
         void pop_front() {
@@ -82,27 +114,6 @@ class DoublyLinkedList {
                 head = nullptr;
             }
             delete temp;
-        }
-
-        void pop_at(int pos) {
-            if(!head || pos < 0) return;
-            Node* current = head;
-            for(int i=0; current && i < pos; i++) {
-                current = current -> next;
-            }
-            if(!current) return;
-
-            if(current == head) {
-                pop_front();
-                return;
-            }
-            if(current == tail) {
-                pop_back();
-                return;
-            }
-            current -> prev -> next = current -> next;
-            current -> next -> prev = current -> prev;
-            delete current;
         }
 
         void print_forward() {
@@ -134,17 +145,21 @@ class DoublyLinkedList {
         }
 };
 
-// int main() {
-//     DoublyLinkedList* list;
-//     list.push_front(5);
-//     list.push_front(4);
-//     list.push_back(6);
-//     list.push_back(7);
-//     list.push_at(2,-77);
-//     list.pop_at(2);
-//     list.print_forward(); // 4 5 6 7
-//     list.print_backward(); // 7 6 5 4
-//     int l = list.get_size();
-//     std::cout<<l<<std::endl;
-//     return 0;
-// }
+int main() {
+    DoublyLinkedList list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    list.push_back(4);
+    list.insert(list.begin()->next->next,999);
+    list.print_forward(); // 1 2 3 999 4
+
+    list.erase(list.end()->prev->prev);
+    list.print_forward(); // 1 2 999 4
+
+    Node* b = list.begin();
+    Node* e = list.end();
+    std::cout<<b->value<<"\n"; // 1
+    std::cout<<e->value<<"\n"; // 4
+    return 0;
+}
