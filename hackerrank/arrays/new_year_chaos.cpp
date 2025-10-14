@@ -19,7 +19,7 @@ void min_bribes(std::vector<int> &q) {
         }
     }
     if(chaotic) {
-        std::cout<<"Too chaotic!!"<<'\n';
+        std::cout<<"Too chaotic"<<'\n';
     } else {
         std::cout<<bribes<<'\n';
     }
