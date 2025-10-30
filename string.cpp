@@ -135,10 +135,14 @@ class String {
 int main() {
     String a = "Hello";
     String b = "World";
+    String x = "a";
     String d = "abcdefghijklmnopqrstuvwxyz";
     String c = a + " "  + b + "!!!";
-    std::cout<<d[2]<<std::endl;
-    // std::cout<<d.c_str()<<std::endl;
-    // std::cout<<c.length()<<std::endl;
+    d[2] = 'A';
+    std::cout<<sizeof(x)<<std::endl; // 48
+    std::cout<<d.c_str()<<std::endl; // abAdefghijklmnopqrstuvwxyz
+    std::cout<<sizeof(d)<<std::endl; // 48
+    // std::cout<<std::boolalpha<<d.inHeap<<std::endl; // when inHeap is public -> true
+    std::cout<<c.length()<<std::endl;
     return 0;
 }
