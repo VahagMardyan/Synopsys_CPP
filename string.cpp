@@ -2,224 +2,141 @@
 
 class String {
     private:
-        char* data;
+        static const int string_size = 23; // for stack
+
+        union {
+            char s[string_size]; // stack-memory (small strings)
+            char *heap; // heap-memory (large strings)
+        };
+        
         size_t size;
         size_t capacity;
+        bool inHeap;
 
-        void resize(size_t new_capacity) {
-            char* new_data = new char[new_capacity];
-            for(size_t i=0;i<size;i++) {
-                new_data[i] = data[i];
+        size_t len(const char* str) {
+            size_t len = 0;
+            while(str[len] != '\0') {
+                len++;
             }
-            new_data[size] = '\0';
-            delete[] data;
-            data = new_data;
-            capacity = new_capacity;
+            return len;
+        }
+
+        void copy(char* dest, const char* src) {
+            size_t i=0;
+            while((dest[i]=src[i]) != '\0') {
+                i++;
+            }
         }
     
     public:
-        String() : data(new char[1]), size(0), capacity(1) {
-            data[0] = '\0';
-        }
-        String(const char* s) {
-            size_t len = 0;
-            while(s[len]!='\0') {
-                len++;
-            }
-            size = len;
-            data = new char[size+1];
-            for(size_t i=0;i<size;i++) {
-                data[i] = s[i];
-            }
-            data[size] = '\0';
-
-            capacity = size + 1;
-        }
-        ~String() {
-            delete[] data;
-        }
-        size_t length() {
-            size_t l = 0;
-            while(data[l]!='\0') {
-                l++;
-            }
-            return l;
-        }
-        String& operator=(const String& s) {
-            if(this == &s) return *this;
-            delete[] data;
-
-            size = s.size;
-            capacity = s.capacity;
-            data = new char[capacity];
-            for(size_t i=0;i<size;i++) {
-                data[i] = s.data[i];
-            }
-            data[size] = '\0';
-            return *this;
-        }
-        String operator+(const String& s) {
-            String result;
-            result.size = this->size + s.size;
-            result.capacity = result.size + 1;
-            result.data = new char[result.capacity];
-            for(size_t i=0;i<this->size;i++) {
-                result.data[i] = this->data[i];
-            }
-            for(size_t i=0; i<s.size;i++) {
-                result.data[this->size + i] = s.data[i];
-            }
-            result.data[result.size] = '\0';
-            return result;
-        }
-
-        bool operator==(const String& s) const {
-            if(size!=s.size) {
-                return false;
-            }
-            for(size_t i=0;i<size;i++) {
-                if(data[i] != s.data[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        char& operator[](size_t index) {
-            return data[index];   
-        }
-
-        const char& operator[](size_t index) const {
-            return data[index];
-        }
-
-        String& operator+=(const String& s) {
-            append(s);
-            return *this;
-        }
-
-        String& operator+=(char c) {
-            append(c);
-            return *this;
-        }
-
-        char at(size_t index) {
-            if (index >= size) {
-                throw std::out_of_range("Index out of range");
+        String(const char* str) {
+            size = len(str);
+            if(size < string_size) {
+                inHeap = false;
+                capacity = string_size - 1;
+                copy(s,str);
             } else {
-                return data[index];
+                inHeap = true;
+                capacity = size;
+                heap = new char[capacity + 1];
+                copy(heap, str);
             }
         }
 
-        int find(char c) {
-            for(size_t i=0;i<size;i++) {
-                if(data[i] == c) {
-                    return i;
+        String() {}
+
+        ~String() {
+            if(inHeap) {
+                delete[] heap;
+            }
+        }
+
+        // // copy constructor
+        String(const String& other_str) {
+            size = other_str.size;
+            capacity = other_str.capacity;
+            inHeap = other_str.inHeap;
+            if(inHeap) {
+                heap = new char[capacity + 1];
+                copy(heap, other_str.heap);
+            } else {
+                copy(s, other_str.s);
+            }
+        }
+
+        String& operator=(const String& other) {
+            if(this == &other) {
+                return *this;
+            }
+            if(inHeap) {
+                delete[] heap;
+            }
+            size = other.size;
+            capacity = other.capacity;
+            inHeap = other.inHeap;
+            if(inHeap) {
+                heap = new char[capacity + 1];
+                copy(heap, other.heap);
+            } else {
+                copy(s,other.s);
+            }
+            return *this;
+        }
+        char& operator[](size_t i) {
+            return inHeap ? heap[i] : s[i];
+        }
+        const char* c_str() const {
+            return inHeap ? heap : s;
+        }
+        size_t length() const {
+            return size;
+        }
+        String operator + (const String& other) const {
+            String result;
+            size_t new_size = size + other.size;
+            if(new_size < string_size) {
+                result.inHeap = false;
+                result.capacity = string_size - 1;
+                result.size = new_size;
+
+                size_t i = 0, j = 0;
+                while(i < size) {
+                    result.s[i] = inHeap ? heap[i] : s[i];
+                    i++;
                 }
-            }
-            return -1;
-        }
-
-        int find(const String& val) {
-            if(val.size == 0) {
-                return 0;
-            }
-            for(size_t i=0; i <= this->size - val.size; i++) {
-                bool match = true;
-                for(size_t j=0; j<val.size; j++) {
-                    if(data[i+j] != val.data[j]) {
-                        match = false;
-                        break;
-                    }
+                while(j < other.size) {
+                    result.s[i] = other.inHeap ? other.heap[j] : other.s[j];
+                    j++;
+                    i++;
                 }
-                if(match) {
-                    return i;
+                result.s[i] = '\0';
+            } else {
+                result.inHeap = true;
+                result.capacity = new_size;
+                result.size = new_size;
+                result.heap = new char[new_size + 1];
+                size_t i = 0, j = 0;
+                while(i < size) {
+                    result.heap[i] = inHeap ? heap[i] : s[i];
+                    i++;
                 }
+                while(j < other.size) {
+                    result.heap[i] = other.inHeap ? other.heap[j] : other.s[j];
+                    j++;
+                    i++;
+                }
+                result.heap[i] = '\0';
             }
-            return -1;
-        }
-
-        void append(const String& s) {
-            size_t total_size = this->size + s.size;
-            if(total_size >= capacity) {
-                resize(total_size + 1);
-            }
-            for(size_t i=0;i<s.size;i++) {
-                data[size+i] = s.data[i];
-            }
-            size = total_size;
-            data[size] = '\0';
-        }
-
-        void append(char c) {
-            if(size + 1 >= capacity) {
-                resize(size + 2);
-            }
-            data[size] = c;
-            size++;
-            data[size] = '\0';
-        }
-
-        void clear() {
-            delete[] data;
-            size = 0;
-            capacity = 1;
-            data = new char[capacity];
-            data[0] = '\0';
-        }
-
-        void insert(const String& s, size_t index) {
-            if(index > size) {
-                index = size;
-            }
-            size_t total_size = this->size + s.size;
-            if(total_size >= capacity) {
-                resize(total_size + 1);
-            }
-            for(int i=size;i>index; i--) {
-                data[i + s.size - 1] = data[i - 1];
-            }
-            for(size_t i=0;i<s.size;i++) {
-                data[index + i] = s.data[i];
-            }
-            size = total_size;
-            data[size] = '\0';
-        }
-
-        void erase(size_t start, size_t end) {
-            if(start >= size || start > end) return;
-            if(end >= size) end = size - 1;
-            size_t count = end - start + 1;
-            for(size_t i = start; i + count < size; i++) {
-                data[i] = data[i + count];
-            }
-            size -= count;
-            data[size] = '\0'; 
-        }
-
-        void print() {
-            for(size_t i=0;i<size;i++) {
-                std::cout<<data[i];
-            }
-            std::cout<<'\n';
-        }
-        void reverse() {
-            for(size_t i=0;i<size/2;i++) {
-                char temp = data[i];
-                data[i] = data[size - 1 - i];
-                data[size - 1 - i] = temp;
-            }
-            data[size] = '\0';
+            return result;
         }
 };
 
 int main() {
-    String s = "Hello";
-    String x = " World";
-    String n = s+x;
-    // n.insert("ABC",2);
-    // n.erase(2,5);
-    n.reverse();
-    n.print();
+    String a = "Hello";
+    String b = "World";
+    String d = "abcdefghijklmnopqrstuvwxyz";
+    String c = a + " "  + b + "!!!";
+    std::cout<<c.c_str()<<std::endl;
+    std::cout<<c.length()<<std::endl;
     return 0;
 }
