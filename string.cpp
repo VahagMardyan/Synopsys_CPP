@@ -84,6 +84,7 @@ class String {
         }
         char& operator[](size_t i) {
             return inHeap ? heap[i] : s[i];
+            // return inHeap ? *(heap + i) : *(s + i);
         }
         const char* c_str() const {
             return inHeap ? heap : s;
@@ -136,7 +137,8 @@ int main() {
     String b = "World";
     String d = "abcdefghijklmnopqrstuvwxyz";
     String c = a + " "  + b + "!!!";
-    std::cout<<c.c_str()<<std::endl;
-    std::cout<<c.length()<<std::endl;
+    std::cout<<d[2]<<std::endl;
+    // std::cout<<d.c_str()<<std::endl;
+    // std::cout<<c.length()<<std::endl;
     return 0;
 }
