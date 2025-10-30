@@ -14,11 +14,11 @@ class String {
         bool inHeap;
 
         size_t len(const char* str) {
-            size_t len = 0;
-            while(str[len] != '\0') {
-                len++;
+            size_t l = 0;
+            while(str[l] != '\0') {
+                l++;
             }
-            return len;
+            return l;
         }
 
         void copy(char* dest, const char* src) {
